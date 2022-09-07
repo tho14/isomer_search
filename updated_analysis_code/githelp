@@ -1,0 +1,16 @@
+# Config options
+git config --global user.name "Chester, Aaron"
+git config --global user.email "chestera@msu.edu"
+
+# Initialize repository
+git init
+git remote add origin git@gitlab.msu.edu:e17011/rootanalysis.git
+
+# Add everything and push commit
+git add .
+git commit -m "Your message here"
+git push -u origin master
+
+To ignore files add them to .gitignore
+
+The files can be found on the MSU GitLab: https://gitlab.msu.edu/e17011/rootanalysis

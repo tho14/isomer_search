@@ -239,11 +239,62 @@ void TCorrelatorData::Reset()
   dnumcorr = 0;
 
   //Isomer hunting!!!!
-  //loop over detectors
-  fill(begin(labr3_implant_tdiff),end(labr3_implant_tdiff),0);
-  fill(begin(sega_implant_tdiff),end(sega_implant_tdiff),0);
+  //Trying something new
+  // sega_implant_tdiff = new double**[nsega];
+  // for(int i = 0; i < nsega; i++){
+  //   sega_implant_tdiff[i] = new double*[npspmt];
+  //   for(int j = 0; j < npspmt; j++){
+  //     sega_implant_tdiff[i][j] = new double[npspmt];
+  //     for(int k = 0; k < npspmt; k++){
+  // 	sega_implant_tdiff[i][j][k] = 0;
+  //     }
+  //   }
+  // }
 
-    // PSPMT specific stuff
+  // sega_implant_idE1 = new double**[nsega];
+  // for(int i = 0; i < nsega; i++){
+  //   sega_implant_idE1[i] = new double*[npspmt];
+  //   for(int j = 0; j < npspmt; j++){
+  //     sega_implant_idE1[i][j] = new double[npspmt];
+  //     for(int k = 0; k < npspmt; k++){
+  // 	sega_implant_idE1[i][j][k] = 0;
+  //     }
+  //   }
+  // }
+
+  // sega_implant_itofpin01i2s = new double**[nsega];
+  // for(int i = 0; i < nsega; i++){
+  //   sega_implant_itofpin01i2s[i] = new double*[npspmt];
+  //   for(int j = 0; j < npspmt; j++){
+  //     sega_implant_itofpin01i2s[i][j] = new double[npspmt];
+  //     for(int k = 0; k < npspmt; k++){
+  // 	sega_implant_itofpin01i2s[i][j][k] = 0;
+  //     }
+  //   }
+  // }
+  
+  //SeGAs
+  for(int i = 0; i < nsega; i++){
+    for(int j = 0; j < npspmt; j++){
+      for(int k = 0; k < npspmt; k++){
+  	sega_implant_tdiff[i][j][k] = {0};
+  	sega_implant_idE1[i][j][k] =  {0};
+  	sega_implant_itofpin01i2s[i][j][k] =  {0};
+      }
+    }
+  }
+  //LaBr3s
+  for(int i = 0; i < nlabr3; i++){
+    for(int j = 0; j < npspmt; j++){
+      for(int k = 0; k < npspmt; k++){
+  	labr3_implant_tdiff[i][j][k] =  {0};
+    	labr3_implant_idE1[i][j][k] =  {0};
+  	labr3_implant_itofpin01i2s[i][j][k] =  {0};
+      }
+    }
+  }
+
+  // PSPMT specific stuff
   // -- ASC 3/20/2020
   //
   // Dynode
@@ -252,44 +303,44 @@ void TCorrelatorData::Reset()
   didyecal = 0.;
   // Anode implant positions
   // --ASC 9/6/2019
-   ixpos = -1;
-   iypos = -1;
-   dxpos = -1;
-   dypos = -1;
-   dixpos = -1; // For correlated events
-   diypos = -1; // For correlated events
+  ixpos = -1;
+  iypos = -1;
+  dxpos = -1;
+  dypos = -1;
+  dixpos = -1; // For correlated events
+  diypos = -1; // For correlated events
   // Correlated ion dynode fit information
-   didychisq_single = 0.;
-   didyE1real_single = 0.;
-   didyT1_single = 0.;
-   didyE1steepness_single = 0.;
-   didyE1decay_single = 0.;
-   didychisq_double = 0.;
-   didyE1real_double = 0.;
-   didyE1steepness_double = 0.;
-   didyE1decay_double = 0.;
-   didyT1_double = 0.;
-   didyE2real_double = 0.;
-   didyE2steepness_double = 0.;
-   didyE2decay_double = 0.;
-   didyT2_double = 0.;
-   didytdiff = 0.;
+  didychisq_single = 0.;
+  didyE1real_single = 0.;
+  didyT1_single = 0.;
+  didyE1steepness_single = 0.;
+  didyE1decay_single = 0.;
+  didychisq_double = 0.;
+  didyE1real_double = 0.;
+  didyE1steepness_double = 0.;
+  didyE1decay_double = 0.;
+  didyT1_double = 0.;
+  didyE2real_double = 0.;
+  didyE2steepness_double = 0.;
+  didyE2decay_double = 0.;
+  didyT2_double = 0.;
+  didytdiff = 0.;
   // Correlated decay dynode fit information
-   ddychisq_single = 0.;
-   ddyE1real_single = 0.;
-   ddyT1_single = 0.;
-   ddyE1steepness_single = 0.;
-   ddyE1decay_single = 0.;
-   ddychisq_double = 0.;
-   ddyE1real_double = 0.;
-   ddyE1steepness_double = 0.;
-   ddyE1decay_double = 0.;
-   ddyT1_double = 0.;
-   ddyE2real_double = 0.;
-   ddyE2steepness_double = 0.;
-   ddyE2decay_double = 0.;
-   ddyT2_double = 0.;
-   ddytdiff = 0.;
+  ddychisq_single = 0.;
+  ddyE1real_single = 0.;
+  ddyT1_single = 0.;
+  ddyE1steepness_single = 0.;
+  ddyE1decay_single = 0.;
+  ddychisq_double = 0.;
+  ddyE1real_double = 0.;
+  ddyE1steepness_double = 0.;
+  ddyE1decay_double = 0.;
+  ddyT1_double = 0.;
+  ddyE2real_double = 0.;
+  ddyE2steepness_double = 0.;
+  ddyE2decay_double = 0.;
+  ddyT2_double = 0.;
+  ddytdiff = 0.;
 
   // Event type idenfiers
   isimplant = 0;

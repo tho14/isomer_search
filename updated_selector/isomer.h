@@ -42,9 +42,15 @@ class isomer : public TSelector {
   TCutG *cut[30] = {};
 
   double halflife[30];
+  int nsega = 16;
+  int nlabr3 = 15;
+  int nblob = 30;
+  int npspmt = 16;
 
   TH2D* hsegaecal_v_tdiff_gamma_only[30] = {nullptr};//first fill with implant events; add events with gamma only
   TH2D* hlabr3ecal_v_tdiff_gamma_only[30] = {nullptr};
+  TH2D *hPID1 = nullptr;
+  TH2D *hPID2 = nullptr;
 
   // Readers to access the data (delete the ones you do not need).
   TTreeReaderValue<unsigned int> fUniqueID = {fReader, "fUniqueID"};
@@ -134,6 +140,12 @@ class isomer : public TSelector {
   TTreeReaderValue<Int_t> corr_mult = {fReader, "corr.mult"};
   TTreeReaderValue<Int_t> corr_dmult = {fReader, "corr.dmult"};
   TTreeReaderValue<Int_t> corr_dnumcorr = {fReader, "corr.dnumcorr"};
+  TTreeReaderArray<Double_t> corr_labr3_implant_tdiff = {fReader, "corr.labr3_implant_tdiff[15][16][16]"};
+   TTreeReaderArray<Double_t> corr_sega_implant_tdiff = {fReader, "corr.sega_implant_tdiff[16][16][16]"};
+   TTreeReaderArray<Double_t> corr_labr3_implant_idE1 = {fReader, "corr.labr3_implant_idE1[15][16][16]"};
+   TTreeReaderArray<Double_t> corr_labr3_implant_itofpin01i2s = {fReader, "corr.labr3_implant_itofpin01i2s[15][16][16]"};
+   TTreeReaderArray<Double_t> corr_sega_implant_idE1 = {fReader, "corr.sega_implant_idE1[16][16][16]"};
+   TTreeReaderArray<Double_t> corr_sega_implant_itofpin01i2s = {fReader, "corr.sega_implant_itofpin01i2s[16][16][16]"};
   TTreeReaderValue<Double_t> corr_idyecal = {fReader, "corr.idyecal"};
   TTreeReaderValue<Double_t> corr_ddyecal = {fReader, "corr.ddyecal"};
   TTreeReaderValue<Double_t> corr_didyecal = {fReader, "corr.didyecal"};

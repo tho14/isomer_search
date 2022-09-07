@@ -306,8 +306,19 @@ class TCorrelatorData: public TObject
   int dnumcorr;
 
   //Isomer hunting
-  double labr3_implant_tdiff[nlabr3];
-  double sega_implant_tdiff[nsega];
+  //SeGAs
+  /* double*** sega_implant_tdiff; */
+  /* double*** sega_implant_idE1; */
+  /* double*** sega_implant_itofpin01i2s; */
+  
+  double sega_implant_tdiff[nsega][npspmt][npspmt];
+  double sega_implant_idE1[nsega][npspmt][npspmt];
+  double sega_implant_itofpin01i2s[nsega][npspmt][npspmt];
+  
+  //LaBr3s
+  double labr3_implant_tdiff[nlabr3][npspmt][npspmt];
+  double labr3_implant_idE1[nlabr3][npspmt][npspmt];
+  double labr3_implant_itofpin01i2s[nlabr3][npspmt][npspmt];
 
   // PSPMT specific stuff
   // -- ASC 3/20/2020

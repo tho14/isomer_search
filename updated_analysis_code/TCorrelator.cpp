@@ -230,6 +230,7 @@ int TCorrelator::Correlate(TBetaDecayParams &bdecay, TBetaDecayVariables &bdecay
   double current_time = 0;
   if(bdecay.clock.initial > 0)
     {
+      /*********NOTE!!!! Units of time within the correlator must be modified when and comparing event times with detector times******/
       current_time = bdecay.clock.initial / 1.e6; // Time in ms
     }
   else
@@ -552,7 +553,6 @@ int TCorrelator::Correlate(TBetaDecayParams &bdecay, TBetaDecayVariables &bdecay
 	    {
 	      // Note: need abs(timeDiffIon) for reverse correlation!
 	      timeDiffIon = std::abs(current_time - fImplant[xPos][yPos].time);
-
 	      if(timeDiffIon > 0)
 		{	    
 		  // Check for existing implant in this pixel
@@ -569,6 +569,8 @@ int TCorrelator::Correlate(TBetaDecayParams &bdecay, TBetaDecayVariables &bdecay
 		    }
 
 		  // Assign values -- this overwrites the previous implant
+		  //Quick check 09/05
+		  //fImplant[xPos][yPos].time = timeDiffIon;
 		  fImplant[xPos][yPos].time = current_time;
 		  fImplant[xPos][yPos].dE1 = bdecay.pid.de1;
 		  fImplant[xPos][yPos].tofpin01i2s = bdecay.pid.pin01i2s;
@@ -595,11 +597,6 @@ int TCorrelator::Correlate(TBetaDecayParams &bdecay, TBetaDecayVariables &bdecay
 
 		  // Correlator implants
 		  bdecay.corr.itime = fImplant[xPos][yPos].time;
-
-		  //**********9/1/22 check *************//
-		  //bdecay.corr.dtimplant = fImplant[xPos][yPos].dt; // Implant dt from same pixel
-		  //bdecay.corr.itimecal = fImplant[xPos][yPos].dt*bdecayv.clock.calib;
-		  
 		  bdecay.corr.ide1 = fImplant[xPos][yPos].dE1;
 		  bdecay.corr.itofpin01i2s = fImplant[xPos][yPos].tofpin01i2s;
 		  bdecay.corr.ide2 = fImplant[xPos][yPos].dE2;
@@ -607,6 +604,33 @@ int TCorrelator::Correlate(TBetaDecayParams &bdecay, TBetaDecayVariables &bdecay
 		  bdecay.corr.idyecal = fImplant[xPos][yPos].dyecal;
 		  bdecay.corr.ixpos = xPos;
 		  bdecay.corr.iypos = yPos;
+
+		  //9/6/22
+		  //Write time difference and PID correlator parameters for individual pixels across individual gamma ray detectors
+		  //Use same parameter names as in SeGA only and LaBr3 only events!
+		  //SeGAs
+		  double tdiff_sega[nsega][xPos][yPos];
+		  //Energy condition
+		  for(int det = 0; det < nsega; det ++){
+		    if(bdecay.sega.ecal[det] > 10){
+		      tdiff_sega[det][xPos][yPos] = bdecay.sega.time[det]-fImplant[xPos][yPos].time*1.e6;	  
+		      bdecay.corr.sega_implant_tdiff[det][xPos][yPos] = tdiff_sega[det][xPos][yPos];
+		      bdecay.corr.sega_implant_itofpin01i2s[det][xPos][yPos] = fImplant[xPos][yPos].tofpin01i2s;
+		      bdecay.corr.sega_implant_idE1[det][xPos][yPos] = fImplant[xPos][yPos].dE1;
+		    }
+		  }
+		  //LaBr3s
+		  double tdiff_labr3[nlabr3][xPos][yPos];
+		  //Energy condition
+		  for(int det = 0; det < nlabr3; det ++){
+		    if(bdecay.labr3.ecal[det] > 10){
+		      tdiff_labr3[det][xPos][yPos] = bdecay.labr3.time[det]-fImplant[xPos][yPos].time*1.e6;	  
+		      bdecay.corr.labr3_implant_tdiff[det][xPos][yPos] = tdiff_labr3[det][xPos][yPos];
+		      bdecay.corr.labr3_implant_itofpin01i2s[det][xPos][yPos] = fImplant[xPos][yPos].tofpin01i2s;
+		      bdecay.corr.labr3_implant_idE1[det][xPos][yPos] = fImplant[xPos][yPos].dE1;
+		    }
+		  }
+
 		} // End good implant time difference check
 	      else
 		{
@@ -899,24 +923,47 @@ int TCorrelator::Correlate(TBetaDecayParams &bdecay, TBetaDecayVariables &bdecay
   else if(isSeGAOnly)
     { // Can do some isomer hunting in here
       condition = 56;
+      //double maxtdiff = 200000;
+      double tdiff[nsega][npspmt][npspmt];
+      //Energy condition
+      for(int det = 0; det < nsega; det ++){
+	if(bdecay.sega.ecal[det] > 10){
+	  for(int xg = 0; xg < npspmt; xg++){
+	    for(int yg = 0; yg < npspmt; yg++){
+	      tdiff[det][xg][yg] = bdecay.sega.time[det]-fImplant[xg][yg].time*1.e6;
+	      //check
+	      // if(det == 15 && fImplant[xg][yg].time > 0){
+	      // 	cout<<"sega num: "<<det<<" sega ecal: "<<bdecay.sega.ecal[det]<<"xpos: "<<xg<<" ypos: "<<yg<<" implant time: " <<fImplant[xg][yg].time*1.e6<<" sega time: "<<bdecay.sega.time[det]<<endl;
+	      // }
+	      //tdiff[det] = bdecay.sega.time[det]-fImplant[xg][yg].dt;
+	      //if(tdiff[det][xg][yg] < maxtdiff){
+	      bdecay.corr.sega_implant_tdiff[det][xg][yg] = tdiff[det][xg][yg];
+	      //PID info
+	      bdecay.corr.sega_implant_itofpin01i2s[det][xg][yg] = fImplant[xg][yg].tofpin01i2s;
+	      bdecay.corr.sega_implant_idE1[det][xg][yg] = fImplant[xg][yg].dE1;
+	      // }
+	    }
+      	  }
+      	}
+      }  
     }
   else if(isLaBr3Only)
     { // Can do some isomer hunting in here
       condition = 60;
-      double maxtdiff = 200000;
-      double tdiff[15];
-      for(int xg = 0; xg < npspmt; xg++){
-	for(int yg = 0; yg < npspmt; yg++){
-	  for(int det = 0; det < 15; det ++){
-	    tdiff[det] = bdecay.labr3.timecal[det]-fImplant[xg][yg].time;
-	    if(tdiff[det] < maxtdiff){
-	      gtime[xg][yg] = ;//gamma of individual implants that have their specific positions
-	      //corr.gamma parameters;
-	      //create g versions of all corrr stuff in the future
-	      //So these can make sense for isotope identification
+      //double maxtdiff = 200000;
+      double tdiff[nlabr3][npspmt][npspmt];
+      for(int det = 0; det < nlabr3; det ++){
+	//Energy condition
+	if(bdecay.labr3.ecal[det] > 10){
+	  for(int xg = 0; xg < npspmt; xg++){
+	    for(int yg = 0; yg < npspmt; yg++){
+	      tdiff[det][xg][yg] = bdecay.labr3.timecal[det]-fImplant[xg][yg].time*1.e6;
+	      bdecay.corr.labr3_implant_tdiff[det][xg][yg] = tdiff[det][xg][yg];
+	      bdecay.corr.labr3_implant_itofpin01i2s[det][xg][yg] = fImplant[xg][yg].tofpin01i2s;
+	      bdecay.corr.labr3_implant_idE1[det][xg][yg] = fImplant[xg][yg].dE1;
 	    }
-	  }
-	}
+      	  }
+      	}
       }   
     }
   else if(isGammaOnly)
